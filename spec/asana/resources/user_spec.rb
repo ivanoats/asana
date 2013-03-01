@@ -15,7 +15,7 @@ module Asana
     end
 
     describe '.all' do
-      it 'should return all users for all of the given user\'s workspaces' do
+      it "should return all users for all of the given user's workspaces" do
         users = User.all
         users.must_be_instance_of Array
         users.first.must_be_instance_of User
@@ -23,7 +23,7 @@ module Asana
     end
 
     describe '.find' do
-      it 'should return the user with the given ID' do
+      it "should return the user with the given ID" do
         user = User.me
         user = User.find(user.id)
         user.wont_be_nil
@@ -32,31 +32,10 @@ module Asana
     end
 
     describe '.me' do
-      it 'should return the user associated with the given API key' do
+      it "should return the user associated with the given API key" do
         user = User.me
         user.wont_be_nil
         user.must_be_instance_of User
-      end
-    end
-
-    describe '#destroy' do
-      it 'should raise an ActiveResource::MethodNotAllowed exception' do
-        user = User.me
-        lambda { user.destroy }.must_raise ActiveResource::MethodNotAllowed
-      end
-    end
-
-    describe '#save' do
-      it 'should raise an ActiveResource::MethodNotAllowed exception' do
-        user = User.me
-        lambda { user.save }.must_raise ActiveResource::MethodNotAllowed
-      end
-    end
-
-    describe '#update' do
-      it 'should raise an ActiveResource::MethodNotAllowed exception' do
-        user = User.me
-        lambda { user.update_attribute(:name, 'foo') }.must_raise ActiveResource::MethodNotAllowed
       end
     end
 
