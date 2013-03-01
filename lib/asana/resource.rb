@@ -1,52 +1,86 @@
 module Asana
-  class Resource < ActiveResource::Base
+  class Resource
     class << self
 
-      def check_prefix_options(options)
-      end
-
-      def custom_method_collection_url(method_name, options = {})
-        prefix_options, query_options = split_options(options)
-        if method_name
-          "#{prefix(prefix_options)}#{collection_name}/#{method_name}.#{format.extension}#{query_string(query_options)}"
-        else
-          "#{prefix(prefix_options)}#{collection_name}.#{format.extension}#{query_string(query_options)}"
+      def connection
+        @connection ||= Faraday.new(Config::API_ENDPOINT) do |c|
+          c.basic_auth(Asana.api_key, '')
+          c.adapter :net_http
+          c.headers[:user_agent] = Config::USER_AGENT
         end
       end
 
-      def parent_resources(*resources)
-        @parent_resources = resources
-      end
-
-      def prefix(options = {})
-        if options.any?
-          self.site.path + options.map { |k, v| "#{k.to_s.chomp('_id').pluralize}/#{v}" }.join + '/'
-        else
-          self.site.path
+      def get(path, params = {})
+        data = request(:get, path, params).fetch('data')
+        if data.is_a? Array
+          get_collection(data)
+        elsif data.is_a? Hash
+          get_member(data)
         end
       end
 
-      def prefix_options
-        id ? {} : super
+      def post(path, data)
+        self.new(request(:post, path, data.to_query))
       end
 
-      def prefix_source
-        if @parent_resources
-          self.site.path + @parent_resources.map { |r| "#{r.to_s.pluralize}/:#{r}_id" }.join + '/'
-        else
-          self.site.path
-        end
+      def put(path, data)
+        self.new(request(:put, path, data.to_query))
       end
+
+      def delete(path)
+        request(:delete, path, data.to_query)
+      end
+
+      private
+
+        def request(method, path, data)
+          res = connection.send(method, path, data)
+          if res.success?
+            JSON.load(res.body)
+          end
+        end
+
+        def get_collection(data)
+          [].tap do |a|
+            data.each do |o|
+              a << self.new(o)
+            end
+          end
+        end
+
+        def get_member(data)
+          self.new(data)
+        end
 
     end
 
-    def method_not_allowed
-      raise ActiveResource::MethodNotAllowed.new(__method__)
+    def initialize(h = {})
+      h.each_pair do |k, v|
+        self.class.module_eval { attr_accessor k.to_sym }
+        self.send(:"#{k}=", v)
+      end
     end
 
-    def to_json(options={})
-      super({ :root => 'data' }.merge(options))
+    def path
+      "#{self.class::COLLECTION}/#{id}"
+    end
+
+    def get(path, params = {})
+      self.class.get(path, params)
+    end
+
+    def post(data)
+      self.class.post(path, data)
+    end
+
+    def put(data)
+      self.class.put(path, Hash.new(self).merge(data))
+    end
+
+    def delete
+      self.class.delete(path)
     end
 
   end
 end
+

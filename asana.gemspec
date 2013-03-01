@@ -9,8 +9,9 @@ Gem::Specification.new do |gem|
   gem.homepage      = "http://github.com/rbright/asana"
 
   gem.add_dependency 'activeresource', '~> 3.2.3'
+  gem.add_dependency 'faraday'
 
-  gem.add_development_dependency 'growl', '~> 1.0.3'
+  gem.add_development_dependency 'debugger'
   gem.add_development_dependency 'guard-minitest', '~> 0.5.0'
   gem.add_development_dependency 'minitest', '~> 2.12.1'
   gem.add_development_dependency 'rake', '~> 0.9.2.2'
