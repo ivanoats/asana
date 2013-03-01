@@ -16,22 +16,8 @@ module Asana
 
     describe '.find' do
       it 'should return a single story' do
-        story_id = Project.all.first.tasks.first.stories.first.id
-        Story.find(story_id).must_be_instance_of Story
-      end
-    end
-
-    describe '#destroy' do
-      it 'should raise an ActiveResource::MethodNotAllowed exception' do
-        story = Project.all.first.tasks.first.stories.first
-        lambda { story.destroy }.must_raise ActiveResource::MethodNotAllowed
-      end
-    end
-
-    describe '#update' do
-      it 'should raise an ActiveResource::MethodNotAllowed exception' do
-        story = Project.all.first.tasks.first.stories.first
-        lambda { story.save }.must_raise ActiveResource::MethodNotAllowed
+        story = Project.all.first.tasks.first.stories.first.id
+        Story.find(story.id).must_be_instance_of Story
       end
     end
 
