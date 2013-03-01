@@ -69,8 +69,8 @@ module Asana
       self.class.get(path, params)
     end
 
-    def post(data)
-      self.class.post(path, data)
+    def post(data, alt_path = nil)
+      self.class.post(alt_path || path, data)
     end
 
     def put(data)

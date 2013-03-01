@@ -2,15 +2,12 @@ module Asana
   class Task < Resource
 
     COLLECTION = "tasks"
+    SUBTASK_COLLECTION = "subtasks"
 
     class << self
 
       def find(id)
         get("#{COLLECTION}/#{id}")
-      end
-
-      def create(data)
-        post("#{COLLECTION}/#{id}", data)
       end
 
       def update(id, data)
@@ -33,6 +30,16 @@ module Asana
         Tag.get("#{COLLECTION}/#{id}/#{Tag::COLLECTION}")
       end
 
+      def subtasks(id)
+        get("#{COLLECTION}/#{id}/#{SUBTASK_COLLECTION}")
+      end
+
+      def create_subtask(id, data)
+        post("#{COLLECTION}/#{id}/#{SUBTASK_COLLECTION}", {
+          :assignee => 'me'
+        }.merge(data))
+      end
+
     end
 
     def update(data)
@@ -53,6 +60,16 @@ module Asana
 
     def tags
       Tag.get("#{path}/#{Tag::COLLECTION}")
+    end
+
+    def subtasks
+      get("#{path}/#{SUBTASK_COLLECTION}")
+    end
+
+    def create_subtask(data)
+      post({
+        :assignee => 'me'
+      }.merge(data), "#{path}/#{SUBTASK_COLLECTION}")
     end
 
   end

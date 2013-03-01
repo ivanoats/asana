@@ -64,6 +64,24 @@ module Asana
         tags.first.must_be_instance_of Tag
       end
     end
+
+    describe '.subtasks' do
+      it 'should return all subtasks for the given task' do
+        task = Project.all.last.tasks.first
+        subtasks = Task.subtasks(task.id)
+        subtasks.must_be_instance_of Array
+        subtasks.first.must_be_instance_of Task
+      end
+    end
+
+    describe '.create_subtask' do
+      it 'should create a new subtask for the given task' do
+        task = Project.all.first.tasks.first
+        subtask = Task.create_subtask(task.id, :name => 'asana-test-task')
+        subtask.must_be_instance_of Task
+      end
+    end
+
     describe '#projects' do
       it 'should return all projects for the given task' do
         task = Project.all.first.tasks.first
@@ -96,6 +114,23 @@ module Asana
         tags = task.tags
         tags.must_be_instance_of Array
         tags.first.must_be_instance_of Tag
+      end
+    end
+
+    describe '#subtasks' do
+      it 'should return all subtasks for the given task' do
+        task = Project.all.last.tasks.first
+        subtasks = task.subtasks
+        subtasks.must_be_instance_of Array
+        subtasks.first.must_be_instance_of Task
+      end
+    end
+
+    describe '#create_subtask' do
+      it 'should create a new subtask for the given task' do
+        task = Project.all.first.tasks.first
+        subtask = task.create_subtask(:name => 'asana-test-task')
+        subtask.must_be_instance_of Task
       end
     end
 
